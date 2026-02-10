@@ -1,5 +1,6 @@
 from typing import Tuple, List
 import random
+from collections import deque
 
 north = 1  # 0001
 east = 2   # 0010
@@ -28,6 +29,7 @@ class Maze:
         self.height: int = height
         self.entry = (0, 0)
         self.exit = (self.width - 1, self.height - 1)
+        self.solution_cells = set()
         self.grid: List[List[Cell]] = [
             [Cell() for _ in range(width)]
             for _ in range(height)
@@ -86,7 +88,7 @@ class Maze:
                 self.open_passage(x, y, direction)
                 self._dfs(nx, ny)
 
-    def display_ascii(self):
+    def display_ascii(self) -> None:
         for x in range(self.width):
             cell = self.grid[0][x]
             print("+---" if cell.has_wall(north) else "+   ", end="")
@@ -99,6 +101,8 @@ class Maze:
                     print(" E ", end="")
                 elif (x, y) == self.exit:
                     print(" X ", end="")
+                elif hasattr(self, "solution_cells") and (x, y) in self.solution_cells:
+                    print(" . ", end="")
                 else:
                     print("   ", end="")
             last_cell = self.grid[y][self.width - 1]
@@ -107,3 +111,77 @@ class Maze:
                 cell = self.grid[y][x]
                 print("+---" if cell.has_wall(south) else "+   ", end="")
             print("+")
+
+    def solve(self):
+        start = self.entry
+        goal = self.exit
+        queue = deque()
+        queue.append(start)
+        visited = set()
+        visited.add(start)
+        parent = {}
+        parent[start] = None
+
+        while queue:
+            x, y = queue.popleft()
+            if (x, y) == goal:
+                break
+            cell = self.get_cell(x, y)
+            for direction, nx, ny in self.get_neighbors(x, y):
+                if direction == north and cell.has_wall(north):
+                    continue
+                if direction == south and cell.has_wall(south):
+                    continue
+                if direction == east and cell.has_wall(east):
+                    continue
+                if direction == west and cell.has_wall(west):
+                    continue
+                if (nx, ny) not in visited:
+                    visited.add((nx, ny))
+                    parent[(nx, ny)] = (x, y)
+                    queue.append((nx, ny))
+
+        if goal not in parent:
+            return None
+
+        path = []
+        cur = goal
+        while cur != start:
+            prev = parent[cur]
+            px, py = prev
+            cx, cy = cur
+            if cx == px and cy == py - 1:
+                path.append(north)
+            elif cx == px and cy == py + 1:
+                path.append(south)
+            elif cx == px + 1 and cy == py:
+                path.append(east)
+            elif cx == px - 1 and cy == py:
+                path.append(west)
+            cur = prev
+
+        path.reverse()
+        solution_cells = []
+        x, y = start
+        solution_cells.append((x, y))
+        for move in path:
+            if move == north:
+                y -= 1
+            elif move == south:
+                y += 1
+            elif move == east:
+                x += 1
+            elif move == west:
+                x -= 1
+            solution_cells.append((x, y))
+        self.solution_cells = set(solution_cells)
+        return path
+
+    def export_hex(self, filename: str) -> None:
+        with open(filename, "w") as f:
+            for y in range(self.height):
+                row = []
+                for x in range(self.width):
+                    cell = self.grid[y][x]
+                    row.append(format(cell.walls, "x"))
+                f.write(" ".join(row) + "\n")
