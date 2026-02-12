@@ -1,11 +1,6 @@
 import sys
 from mazegen.parsing import Parsing
 from mazegen1 import MazeGenerator, MazeVisualizer
-# try:
-#     import mlx
-# except ImportError:
-#     print("Warning: MLX library ma kaynach. Ghadi nkhdm bla visual.")
-#     mlx = None
 
 
 def main():
@@ -17,15 +12,12 @@ def main():
             content: str = file.read()
             parser = Parsing(content)
             config = parser.parse()
-            maze = MazeVisualizer(config["WIDTH"], config["HEIGHT"], config["PERFECT"])
-            maze.render()
-            # generator = MazeGenerator(config["WIDTH"], config["HEIGHT"], False)
-            # start_x, start_y = config["ENTRY"]
-            # generator.run(start_x, start_y)
-            # generator.print_maze()
-            # maze = Maze(10, 4)
-            # maze.generate()
-            # maze.display_ascii()
+            if config["PERFECT"] == "False":
+                config["PERFECT"] = False
+            maze = MazeVisualizer(config["WIDTH"], config["HEIGHT"],
+                                  config["ENTRY"], config["EXIT"],
+                                  config["PERFECT"])
+            maze.loop()
 
             print("\nMaze Généré!")
     except FileNotFoundError:

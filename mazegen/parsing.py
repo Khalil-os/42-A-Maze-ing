@@ -42,7 +42,8 @@ class Parsing:
                         raise ValueError("you need x,y")
                     x = int(coords[0].strip())
                     y = int(coords[1].strip())
-                    self.config[key] = (x, y)
+
+                    self.config[key] = [x, y]
                 else:
                     self.config[key] = raw_value
             except ValueError as e:
