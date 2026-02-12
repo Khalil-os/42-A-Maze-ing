@@ -88,30 +88,6 @@ class Maze:
                 self.open_passage(x, y, direction)
                 self._dfs(nx, ny)
 
-    def display_ascii(self) -> None:
-        for x in range(self.width):
-            cell = self.grid[0][x]
-            print("+---" if cell.has_wall(north) else "+   ", end="")
-        print("+")
-        for y in range(self.height):
-            for x in range(self.width):
-                cell = self.grid[y][x]
-                print("|" if cell.has_wall(west) else " ", end="")
-                if (x, y) == self.entry:
-                    print(" E ", end="")
-                elif (x, y) == self.exit:
-                    print(" X ", end="")
-                elif hasattr(self, "solution_cells") and (x, y) in self.solution_cells:
-                    print(" . ", end="")
-                else:
-                    print("   ", end="")
-            last_cell = self.grid[y][self.width - 1]
-            print("|" if last_cell.has_wall(east) else " ")
-            for x in range(self.width):
-                cell = self.grid[y][x]
-                print("+---" if cell.has_wall(south) else "+   ", end="")
-            print("+")
-
     def solve(self):
         start = self.entry
         goal = self.exit
