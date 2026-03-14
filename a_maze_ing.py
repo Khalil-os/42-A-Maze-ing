@@ -4,8 +4,9 @@ from mazegen.generator import MazeGenerator
 from mazegen.visualiser import MazeVisualizer
 
 
-def main():
-    """Entry point of the maze application. Loads config and starts the visualizer."""
+def main() -> None:
+    """Entry point of the maze application.
+        Loads config and starts the visualizer."""
     if (len(sys.argv) != 2):
         print("error: you should give one configuration file")
         sys.exit(1)
@@ -24,7 +25,8 @@ def main():
                 raise parser.ConfigSyntaxError("entry = exit")
             maze_vis = MazeVisualizer(config["WIDTH"], config["HEIGHT"],
                                       config["ENTRY"], config["EXIT"],
-                                      config.get("PERFECT", True))
+                                      config.get("PERFECT", True),
+                                      config.get("SEED"))
 
             maze_vis.maze.solve(config["ENTRY"], config["EXIT"])
 

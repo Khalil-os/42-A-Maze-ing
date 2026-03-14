@@ -1,9 +1,8 @@
-width=10
-HEIGHT=10
-ENTRY=1, 2
-EXIT=1, 9
+width=20
+HEIGHT=17
+ENTRY=0, 0
+EXIT=5, 4
 #salam
 OUTPUT_FILE=maze.txt
 PERFECT=tRue
-seed=22
-algo=kkk#
+seed=42

@@ -28,7 +28,8 @@ class MazeGenerator:
         """Custom exception for maze generation errors."""
         pass
 
-    def __init__(self, width: int, height: int, perfect: bool = True) -> None:
+    def __init__(self, width: int, height: int, perfect: bool = True,
+                 seed: int | None = None) -> None:
         """Initialize maze dimensions and internal structures."""
         self.width = width
         self.height = height
@@ -38,11 +39,16 @@ class MazeGenerator:
         self.visited = [[False for _ in range(width)] for _ in range(height)]
         self.solution_cells: set[Tuple[int, int]] = set()
         self.ordered_path: List[Tuple[int, int]] = []
+        self.pattern_omitted: bool = False
         self.pattern_42 = [
             (0, 0), (0, 1), (0, 2), (1, 2), (2, 0), (2, 1), (2, 2),
             (2, 3), (2, 4), (5, 0), (6, 0), (7, 0), (7, 1), (7, 2), (6, 2),
             (5, 2), (5, 3), (5, 4), (6, 4), (7, 4)
         ]
+        if seed is not None:
+            random.seed(seed)
+        else:
+            random.seed()
 
     def get_unvisited_neighbors(
                     self, x: int, y: int) -> List[Tuple[int, int, int]]:
@@ -74,8 +80,10 @@ class MazeGenerator:
     def prottect_pattern(self) -> None:
         """Reserve cells to preserve the '42' pattern in the maze."""
         if self.width < 10 or self.height < 6:
-            raise self.MazeError("the size of the maze does not allow "
-                                 "the 42 pattern to exist")
+            self.pattern_omitted = True
+            print("Error: The size of the maze does not "
+                  "allow the 42 pattern to exist.", file=sys.stderr)
+            return
         center_x = (self.width // 2) - 4
         center_y = (self.height // 2) - 2
 

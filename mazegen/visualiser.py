@@ -38,12 +38,14 @@ class MazeVisualizer():
         space = "  "
 
     def __init__(self, width: int, height: int, entry: Tuple[int, int],
-                 exite: Tuple[int, int], perfect: bool = True) -> None:
+                 exite: Tuple[int, int], perfect: bool = True,
+                 seed: int | None = None) -> None:
         """Initialize the visualizer and generate the maze."""
         self.width = width
         self.height = height
         self.perfect = perfect
-        self.maze = MazeGenerator(width, height, perfect)
+        self.seed = seed
+        self.maze = MazeGenerator(width, height, perfect, seed)
         self.maze.run(0, 0)
         self.show_path = False
         self.entry = entry if entry else (0, 0)
@@ -122,10 +124,13 @@ class MazeVisualizer():
                                         self.Style.block + self.Style.RESET)
         os.system("clear")
         print(f"{self.Style.BOLD}A-Maze-ing 1337{self.Style.RESET}")
+        if self.maze.pattern_omitted:
+            print(f"{self.Style.red}Error: The size of the maze does not "
+                  f"allow the 42 pattern to exist.{self.Style.RESET}")
         for row in v_grid:
             print("".join(row))
 
-    def play_animation(self):
+    def play_animation(self) -> None:
         """Animate the solving path of the maze."""
         path_list = self.maze.solve(self.entry, self.exite)
         if not path_list:
@@ -174,7 +179,8 @@ class MazeVisualizer():
                     break
                 elif choice == 'r':
                     self.maze = MazeGenerator(self.width,
-                                              self.height, self.perfect)
+                                              self.height, self.perfect,
+                                              self.seed)
                     self.maze.run(0, 0)
                     self.show_path = False
                     os.system("clear")
