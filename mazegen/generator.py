@@ -32,7 +32,8 @@ class MazeGenerator:
         self.entree = (0, 0)
         self.grid = [[15 for _ in range(width)] for _ in range(height)]
         self.visited = [[False for _ in range(width)] for _ in range(height)]
-        self.solution_cells = set()
+        self.solution_cells: set[Tuple[int, int]] = set()
+        self.ordered_path: List[Tuple[int, int]] = []
         self.pattern_42 = [
             (0, 0), (0, 1), (0, 2), (1, 2), (2, 0), (2, 1), (2, 2),
             (2, 3), (2, 4), (5, 0), (6, 0), (7, 0), (7, 1), (7, 2), (6, 2),
@@ -107,30 +108,26 @@ class MazeGenerator:
                                 self.remove_walls(x, y, direction)
                                 break
 
-    def solve(self, start: Tuple[int, int] = None,
-              goal: Tuple[int, int] = None) -> List[Tuple[int, int]]:
+    def solve(self, start: Tuple[int, int] | None = None,
+              goal: Tuple[int, int] | None = None) -> List[Tuple[int, int]]:
 
-        if start is None:
-            start = (0, 0)
-        if goal is None:
-            goal = (self.width - 1, self.height - 1)
+        st: Tuple[int, int] = start if start is not None else (0, 0)
+        gl: Tuple[int, int] = (goal if goal is not None else
+                               (self.width - 1, self.height - 1)
+                               )
 
-        start = tuple(start)
-        goal = tuple(goal)
-
-        if not (0 <= start[0] < self.width and 0 <= start[1] < self.height):
+        if not (0 <= st[0] < self.width and 0 <= st[1] < self.height):
             return []
-        if not (0 <= goal[0] < self.width and 0 <= goal[1] < self.height):
+        if not (0 <= gl[0] < self.width and 0 <= gl[1] < self.height):
             return []
 
-        # 2. Bda l-BFS
-        queue = deque([start])
-        visited = {start}
-        parent = {start: None}
+        queue: deque[Tuple[int, int]] = deque([st])
+        visited: set[Tuple[int, int]] = {st}
+        parent: Dict[Tuple[int, int], Tuple[int, int] | None] = {st: None}
 
         while queue:
             curr = queue.popleft()
-            if curr == goal:
+            if curr == gl:
                 break
 
             x, y = curr
@@ -149,12 +146,12 @@ class MazeGenerator:
                         parent[(nx, ny)] = curr
                         queue.append((nx, ny))
 
-        path = []
-        curr = goal
-        if goal in parent:
-            while curr is not None:
-                path.append(curr)
-                curr = parent[curr]
+        path: List[Tuple[int, int]] = []
+        curr_node: Tuple[int, int] | None = gl
+        if gl in parent:
+            while curr_node is not None:
+                path.append(curr_node)
+                curr_node = parent[curr_node]
             path.reverse()
         else:
             return []
@@ -171,7 +168,7 @@ class MazeGenerator:
 
     def get_path_string(self) -> str:
         """Converts the coordinate path to string of N, E, S, W directions."""
-        if not hasattr(self, 'ordered_path') or not self.ordered_path:
+        if not self.ordered_path:
             return ""
 
         path_str = ""
