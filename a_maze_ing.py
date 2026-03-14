@@ -1,6 +1,7 @@
 import sys
 from mazegen.parsing import Parsing
-from mazegen1 import MazeGenerator, MazeVisualizer
+from mazegen.generator import MazeGenerator
+from mazegen.visualiser import MazeVisualizer
 
 
 def main():
@@ -12,12 +13,21 @@ def main():
             content: str = file.read()
             parser = Parsing(content)
             config = parser.parse()
-            if config["PERFECT"] == "False":
+            if "OUTPUT_FILE" not in config:
+                raise parser.ConfigSyntaxError("OUTPUT_FILE is missing"
+                                               "from configuration")
+
+            if config["PERFECT"].lower() == "false":
                 config["PERFECT"] = False
-            maze = MazeVisualizer(config["WIDTH"], config["HEIGHT"],
-                                  config["ENTRY"], config["EXIT"],
-                                  config["PERFECT"])
-            maze.loop()
+            if config['ENTRY'] == config["EXIT"]:
+                raise parser.ConfigSyntaxError("entry = exit")
+            maze_vis = MazeVisualizer(config["WIDTH"], config["HEIGHT"],
+                                      config["ENTRY"], config["EXIT"],
+                                      config.get("PERFECT", True))
+
+            maze_vis.maze.solve(config["ENTRY"], config["EXIT"])
+
+            maze_vis.loop(config)
 
             print("\nMaze Généré!")
     except FileNotFoundError:
@@ -26,6 +36,8 @@ def main():
     except Parsing.ConfigSyntaxError as e:
         print(f"Configuration Syntax Error: '{e}'")
         sys.exit(1)
+    except MazeGenerator.MazeError as e:
+        print("Error:", e)
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 

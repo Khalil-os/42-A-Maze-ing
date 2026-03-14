@@ -27,12 +27,16 @@ class Parsing:
             if (len(parts) != 2):
                 raise Parsing.ConfigSyntaxError(
                     "Configuration's syntax is incorrect")
-            key: str = parts[0].strip()
+            key: str = parts[0].strip().upper()
             raw_value: str = parts[1].strip()
+            if key in self.config:
+                raise Parsing.ConfigSyntaxError(
+                    f"Duplicated configuration key: '{key}'")
+
             try:
                 if (key == "WIDTH" or key == "HEIGHT"):
                     val = int(raw_value)
-                    if (val <= 0):
+                    if (val < 0):
                         raise ValueError("give a positive number")
                     self.config[key] = val
 
@@ -43,7 +47,7 @@ class Parsing:
                     x = int(coords[0].strip())
                     y = int(coords[1].strip())
 
-                    self.config[key] = [x, y]
+                    self.config[key] = (x, y)
                 else:
                     self.config[key] = raw_value
             except ValueError as e:
