@@ -2,15 +2,19 @@ from typing import List, Dict, Any
 
 
 class Parsing:
+    """Parser for configuration content of the maze project."""
 
     class ConfigSyntaxError(Exception):
+        """Custom exception raised for configuration syntax errors."""
         pass
 
     def __init__(self, content: str) -> None:
+        """Initialize parser with raw configuration content."""
         self.content = content
         self.config: Dict[str, Any] = {}
 
     def spliting_file(self) -> List[str]:
+        """Split file content and remove comments or empty lines."""
         l: List[str] = self.content.split('\n')
         clean_lines: list[str] = []
         for line in l:
@@ -22,6 +26,7 @@ class Parsing:
         return (clean_lines)
 
     def parse_lines(self, file: List[str]) -> None:
+        """Parse cleaned configuration lines into key/value pairs."""
         for config in file:
             parts: List[str] = config.split('=')
             if (len(parts) != 2):
@@ -55,12 +60,14 @@ class Parsing:
                     f"error in value of {key}: {e}")
 
     def parse(self) -> Dict[str, Any]:
+        """Execute full parsing process and return configuration."""
         lines = self.spliting_file()
         self.parse_lines(lines)
         return (self.config)
 
 
 def main():
+    """Entry point of the parser module."""
     pass
 
 

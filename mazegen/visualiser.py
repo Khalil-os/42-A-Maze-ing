@@ -20,8 +20,10 @@ Opposite: Dict[int, int] = {north: south,
 
 
 class MazeVisualizer():
+    """Handles visualization and interaction with the generated maze."""
 
     class Style:
+        """ANSI styles, colors, and characters used for rendering."""
         RESET = "\033[0m"
         BOLD = "\033[1m"
         # Colors
@@ -37,7 +39,7 @@ class MazeVisualizer():
 
     def __init__(self, width: int, height: int, entry: Tuple[int, int],
                  exite: Tuple[int, int], perfect: bool = True) -> None:
-
+        """Initialize the visualizer and generate the maze."""
         self.width = width
         self.height = height
         self.perfect = perfect
@@ -56,6 +58,7 @@ class MazeVisualizer():
         self.color_idx = 0
 
     def render(self) -> None:
+        """Render the maze grid in the terminal."""
         print("\033[H", end="")
         map_h: int = self.height * 2 + 1
         map_w: int = self.width * 2 + 1
@@ -123,7 +126,7 @@ class MazeVisualizer():
             print("".join(row))
 
     def play_animation(self):
-
+        """Animate the solving path of the maze."""
         path_list = self.maze.solve(self.entry, self.exite)
         if not path_list:
             return
@@ -135,6 +138,7 @@ class MazeVisualizer():
             time.sleep(0.05)
 
     def validat_maze(self) -> None:
+        """Validate entry and exit positions."""
         if (not (0 <= self.entry[0] < self.width) or
                 not (0 <= self.entry[1] < self.height)):
             raise ValueError("your entry is not valid")
@@ -151,6 +155,7 @@ class MazeVisualizer():
                              "(your entry/exit is in 42_pattern)")
 
     def loop(self, config: Dict[str, Any]) -> None:
+        """Main interactive loop for maze control."""
         os.system("clear")
         self.validat_maze()
 

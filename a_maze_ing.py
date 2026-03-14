@@ -5,6 +5,7 @@ from mazegen.visualiser import MazeVisualizer
 
 
 def main():
+    """Entry point of the maze application. Loads config and starts the visualizer."""
     if (len(sys.argv) != 2):
         print("error: you should give one configuration file")
         sys.exit(1)
