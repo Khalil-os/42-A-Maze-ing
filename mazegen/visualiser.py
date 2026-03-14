@@ -125,7 +125,7 @@ class MazeVisualizer():
         os.system("clear")
         print(f"{self.Style.BOLD}A-Maze-ing 1337{self.Style.RESET}")
         if self.maze.pattern_omitted:
-            print(f"{self.Style.red}Error: The size of the maze does not "
+            print(f"{self.Style.red}Warning: The size of the maze does not "
                   f"allow the 42 pattern to exist.{self.Style.RESET}")
         for row in v_grid:
             print("".join(row))

@@ -26,10 +26,10 @@ clean:
 
 lint:
 	@echo "Running linters..."
-	flake8 --exclude=test
-	mypy --exclude test --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs .
+	flake8 --exclude=venv_test
+	mypy --exclude venv_test --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs .
 
 lint-strict:
 	@echo "Running strict linters..."
-	flake8 --exclude=test
+	flake8 --exclude=venv_test
 	mypy --strict .

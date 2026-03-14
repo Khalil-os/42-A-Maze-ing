@@ -1,8 +1,6 @@
-width=20
+WIDTH=20
 HEIGHT=17
 ENTRY=0, 0
 EXIT=5, 4
-#salam
 OUTPUT_FILE=maze.txt
-PERFECT=tRue
-seed=42
+PERFECT=true
