@@ -5,5 +5,5 @@ EXIT=1, 9
 #salam
 OUTPUT_FILE=maze.txt
 PERFECT=tRue
-seed=22 # to check
+seed=22
 algo=kkk#
