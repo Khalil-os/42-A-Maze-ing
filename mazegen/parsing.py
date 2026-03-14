@@ -27,6 +27,8 @@ class Parsing:
 
     def parse_lines(self, file: List[str]) -> None:
         """Parse cleaned configuration lines into key/value pairs."""
+        valid_keys = {"WIDTH", "HEIGHT", "ENTRY", "EXIT",
+                      "OUTPUT_FILE", "PERFECT", "SEED"}
         for config in file:
             parts: List[str] = config.split('=')
             if (len(parts) != 2):
@@ -34,6 +36,9 @@ class Parsing:
                     "Configuration's syntax is incorrect")
             key: str = parts[0].strip().upper()
             raw_value: str = parts[1].strip()
+            if key not in valid_keys:
+                raise Parsing.ConfigSyntaxError(f"unsupported "
+                                                f"configuration key: '{key}'")
             if key in self.config:
                 raise Parsing.ConfigSyntaxError(
                     f"Duplicated configuration key: '{key}'")
@@ -41,7 +46,7 @@ class Parsing:
             try:
                 if (key == "WIDTH" or key == "HEIGHT"):
                     val = int(raw_value)
-                    if (val < 0):
+                    if (val <= 0):
                         raise ValueError("give a positive number")
                     self.config[key] = val
 
@@ -53,6 +58,8 @@ class Parsing:
                     y = int(coords[1].strip())
 
                     self.config[key] = (x, y)
+                elif (key == "SEED"):
+                    self.config[key] = int(raw_value)
                 else:
                     self.config[key] = raw_value
             except ValueError as e:
@@ -66,7 +73,7 @@ class Parsing:
         return (self.config)
 
 
-def main():
+def main() -> None:
     """Entry point of the parser module."""
     pass
 
