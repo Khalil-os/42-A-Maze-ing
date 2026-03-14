@@ -22,10 +22,14 @@ Opposite: Dict[int, int] = {north: south,
 
 
 class MazeGenerator:
+    """Generates, solves, and exports a maze grid."""
+
     class MazeError(Exception):
+        """Custom exception for maze generation errors."""
         pass
 
     def __init__(self, width: int, height: int, perfect: bool = True) -> None:
+        """Initialize maze dimensions and internal structures."""
         self.width = width
         self.height = height
         self.perfect = perfect
@@ -42,6 +46,7 @@ class MazeGenerator:
 
     def get_unvisited_neighbors(
                     self, x: int, y: int) -> List[Tuple[int, int, int]]:
+        """Return all unvisited neighboring cells with directions."""
         neighbors: List[Tuple[int, int, int]] = []
 
         for direction in [north, south, east, west]:
@@ -53,6 +58,7 @@ class MazeGenerator:
         return neighbors
 
     def remove_walls(self, x: int, y: int, direction: int) -> None:
+        """Remove wall between current cell and neighbor."""
         nx: int = x + Dx[direction]
         ny: int = y + Dy[direction]
         if 0 <= nx < self.width and 0 <= ny < self.height:
@@ -60,12 +66,13 @@ class MazeGenerator:
             self.grid[ny][nx] ^= Opposite[direction]
 
     def is_in_pattern(self, x: int, y: int) -> bool:
-
+        """Check if a cell belongs to the protected pattern."""
         if self.grid[y][x] == 15:
             return True
         return False
 
     def prottect_pattern(self) -> None:
+        """Reserve cells to preserve the '42' pattern in the maze."""
         if self.width < 10 or self.height < 6:
             raise self.MazeError("the size of the maze does not allow "
                                  "the 42 pattern to exist")
@@ -79,6 +86,7 @@ class MazeGenerator:
                 self.visited[y][x] = True
 
     def generate(self, x: int, y: int) -> None:
+        """Generate maze using recursive DFS."""
         self.visited[y][x] = True
 
         while True:
@@ -91,7 +99,7 @@ class MazeGenerator:
             self.generate(nx, ny)
 
     def add_cycles(self, density: float = 0.05) -> None:
-
+        """Add extra openings to create cycles in the maze."""
         for y in range(self.height):
             for x in range(self.width):
                 if self.grid[y][x] == 15:
@@ -110,7 +118,7 @@ class MazeGenerator:
 
     def solve(self, start: Tuple[int, int] | None = None,
               goal: Tuple[int, int] | None = None) -> List[Tuple[int, int]]:
-
+        """Solve the maze using BFS and return the path."""
         st: Tuple[int, int] = start if start is not None else (0, 0)
         gl: Tuple[int, int] = (goal if goal is not None else
                                (self.width - 1, self.height - 1)
@@ -161,13 +169,14 @@ class MazeGenerator:
         return path
 
     def run(self, start_x: int, start_y: int) -> None:
+        """Generate the maze and optionally add cycles."""
         self.prottect_pattern()
         self.generate(start_x, start_y)
         if not self.perfect:
             self.add_cycles()
 
     def get_path_string(self) -> str:
-        """Converts the coordinate path to string of N, E, S, W directions."""
+        """Convert solution path to N/E/S/W direction string."""
         if not self.ordered_path:
             return ""
 
@@ -189,7 +198,7 @@ class MazeGenerator:
 
     def export_to_file(self, filename: str, entry: Tuple[int, int],
                        exit_coord: tuple[int, int]) -> None:
-        """Writes the maze and its solution to the specified output file."""
+        """Export maze grid and solution path to a file."""
         path_str = self.get_path_string()
 
         try:
